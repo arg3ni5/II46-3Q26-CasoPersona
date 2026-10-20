@@ -25,14 +25,19 @@ Public Class PersonaService
     Public Sub GuardarPersona(p As Persona)
         ValidarPersona(p)
         If p.IdPersona = 0 Then
-            If (_personaDB.GetByIdentificacion(p.Identificacion)) IsNot Nothing Then
-                Throw New ArgumentException("La Identificacion de la persona ya existe.")
+            Dim existente As Persona = _personaDB.GetByIdentificacion(p.Identificacion)
+
+            If existente IsNot Nothing AndAlso existente.IdPersona > 0 Then
+                If (_personaDB.GetByIdentificacion(p.Identificacion)) IsNot Nothing Then
+                    Throw New ArgumentException("La Identificacion de la persona ya existe.")
+                End If
+                _personaDB.Insert(p)
+            Else
+                _personaDB.Update(p)
             End If
-            _personaDB.Insert(p)
-        Else
-            _personaDB.Update(p)
         End If
     End Sub
+
 
     Public Sub EliminarPersona(id As String)
         If id.IsNullOrWhiteSpace Then
